@@ -1,0 +1,69 @@
+# ADR-007: Immutable Audit Trail
+
+## Status
+Accepted
+
+## Context
+
+In a financial payment system, maintaining a complete, accurate, and unalterable record of all significant events is paramount. This is driven by:
+-   **Regulatory Compliance**: Financial regulations often mandate detailed audit trails for all transactions.
+-   **Troubleshooting and Debugging**: In a distributed, event-driven architecture, a clear history of events is crucial for diagnosing issues and understanding system behavior.
+-   **Non-repudiation**: Ensuring that once an event has occurred and been recorded, its existence and content cannot be denied or altered.
+-   The `arc42.md` document explicitly lists "Auditability" as a key quality goal and "Immutable Audit Trail" as a cross-cutting concept, highlighting its importance for the showcase.
+
+## Decision
+
+The system will implement an immutable audit trail for all significant payment lifecycle events. Once an audit record is created and persisted, it cannot be altered or deleted. Each event will be recorded with sufficient detail to reconstruct the state and flow of a payment at any given point in time.
+
+## Rationale
+
+1.  **Ensures Data Integrity and Trust**: By making audit records immutable, the system guarantees the integrity and trustworthiness of its historical data, which is fundamental for financial operations.
+2.  **Facilitates Compliance**: Directly addresses regulatory requirements for auditability and traceability in payment processing.
+3.  **Simplifies Debugging and Forensics**: Provides a definitive, chronological sequence of events, making it significantly easier to trace the journey of a payment, identify root causes of issues, and perform forensic analysis.
+4.  **Supports Non-Repudiation**: Offers undeniable proof of events, which is critical in dispute resolution and security investigations.
+5.  **Foundation for Reporting**: The detailed event history can serve as a rich source for various operational and analytical reports.
+
+## Consequences
+
+### Positive
+-   High confidence in the accuracy and reliability of historical payment data.
+-   Streamlined compliance audits and regulatory reporting.
+-   Faster and more accurate incident response and problem diagnosis.
+-   Enhanced security posture by making unauthorized alterations detectable.
+
+### Negative
+-   Increased storage requirements, as audit records are typically never deleted. This needs to be managed over time (e.g., archiving).
+-   Potential for performance overhead if audit logging is not efficiently implemented (e.g., asynchronous writing, optimized database schema).
+-   Requires careful design to ensure audit records are truly immutable at the database level (e.g., restricting update/delete permissions, using append-only tables).
+-   The volume of audit data can grow rapidly, necessitating robust indexing and querying strategies.
+
+## Implementation Notes
+
+-   **Dedicated Audit Tables**: Audit records will be stored in dedicated tables within PostgreSQL, designed for append-only operations.
+-   **Event Structure**: Each audit record will capture:
+    -   A unique `auditEventId`.
+    -   `timestamp` of the event.
+    -   `eventType` (e.g., `PAYMENT_RECEIVED`, `PACS008_GENERATED`, `LEDGER_POSTED`).
+    -   `actor` (e.g., service name, user ID if applicable).
+    -   `correlationId`, `paymentId`, `messageId`, `endToEndId`, `instructionId` for cross-referencing.
+    -   `payload` or `details` containing relevant state changes or message content (e.g., the generated `pacs.008` XML, status updates).
+-   **Append-Only Principle**: Database users/roles responsible for writing audit records will only have `INSERT` privileges on audit tables, explicitly lacking `UPDATE` or `DELETE` permissions.
+-   **Asynchronous Logging (Considered)**: While critical events might be logged synchronously within a transaction, less critical or high-volume events could be published to a Kafka topic (`audit.events`) and consumed by a dedicated `Audit Service` for asynchronous persistence to minimize impact on core transaction processing.
+-   **Indexing**: Ensure appropriate indexes on `timestamp`, `paymentId`, and `correlationId` for efficient querying.
+
+## Alternatives Considered
+
+1.  **Modifiable Audit Logs**:
+    *   **Pros**: Easier to manage storage by allowing deletion or modification of old/irrelevant records.
+    *   **Cons**: Fundamentally compromises the integrity and trustworthiness of the audit trail, making it unsuitable for financial systems and non-compliant with most regulations.
+2.  **Rely Solely on Application Logs (e.g., ELK Stack)**:
+    *   **Pros**: Centralized logging, powerful search capabilities.
+    *   **Cons**: While excellent for operational monitoring and debugging, application logs typically do not offer the same strong transactional guarantees, structured immutability, or long-term retention required for a formal audit trail in a system of record. They are complementary, not a replacement.
+3.  **Full Event Sourcing**:
+    *   **Pros**: The entire system state is derived from an immutable stream of events, inherently providing an audit trail.
+    *   **Cons**: A more complex architectural pattern that might be over-engineered for the current showcase scope, requiring a significant shift in domain modeling and persistence strategy. The current approach focuses on auditing *events* rather than making *all state changes* events.
+
+## References
+
+-   PCI DSS (Payment Card Industry Data Security Standard) - Section 10 (Track and Monitor All Access to Network Resources and Cardholder Data): https://www.pcisecuritystandards.org/ (General principle, not direct applicability to showcase)
+-   Concepts of Event Sourcing (for immutability principles): https://martinfowler.com/eaaDev/EventSourcing.html
