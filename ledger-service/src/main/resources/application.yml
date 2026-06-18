@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: ledger-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sepa_db
+    username: sepa_user
+    password: sepa_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # For showcase, allows easy schema updates. In production, use 'validate' or 'none' with Flyway/Liquibase
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9093 # Kafka broker running on host machine
+      group-id: ledger-service-group # Unique consumer group ID
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: com.example.sepa.common.event.PaymentStatusEvent # Default type for JSON deserialization
+        spring.json.trusted.packages: "com.example.sepa.common.event" # Trust our common event package
+    listener:
+      ack-mode: RECORD # Acknowledge each record individually
+      # Error handling for consumers (ADR-009)
+      common-error-handler:
+        retry-listeners: true # Enable retry listeners for logging
+        max-attempts: 3 # Max attempts including the first one
+        back-off:
+          delay: 1000 # Initial delay of 1 second
+          max-delay: 10000 # Max delay of 10 seconds
+          multiplier: 2.0 # Exponential back-off
+
+# Custom properties
+app:
+  kafka:
+    topics:
+      payment-status: payment.status # Topic for consuming payment status events
