@@ -1,14 +1,17 @@
 # SEPA Instant Payment & ISO 20022
 
+[![Java 21](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/technologies/javase/21-ea-downloads.html)
+[![Spring Boot 3.2.x](https://img.shields.io/badge/Spring_Boot-3.2.x-6DB33F.svg)](https://spring.io/projects/spring-boot)
+[![Spring Cloud Gateway](https://img.shields.io/badge/Spring_Cloud_Gateway-2023.0.1-6DB33F.svg)](https://spring.io/projects/spring-cloud-gateway)
+[![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-2.x-231F20.svg)](https://kafka.apache.org/)
+[![Maven](https://img.shields.io/badge/Build_with-Maven-CC2200.svg)](https://maven.apache.org/)
+[![Docker](https://img.shields.io/badge/Containerized_with-Docker-2496ED.svg)](https://www.docker.com/)
+
+
 > Event-Driven SEPA Instant Payment and ISO 20022 Showcase
 > Built as a software architecture portfolio project demonstrating modern payment processing, settlement, reporting, and operational resilience concepts.
 
 ---
-
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/GROUP/ARTIFACT.svg)](https://search.maven.org/search?q=g:GROUP%20AND%20a:ARTIFACT)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-21-blue.svg)]()
 
 ## Overview
 
