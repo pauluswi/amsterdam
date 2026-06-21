@@ -5,6 +5,11 @@
 
 ---
 
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/GROUP/ARTIFACT.svg)](https://search.maven.org/search?q=g:GROUP%20AND%20a:ARTIFACT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-21-blue.svg)]()
+
 ## Overview
 
 SEPA Instant Payment Gateway is a showcase project that simulates the complete lifecycle of a European credit transfer using ISO 20022 messages.
