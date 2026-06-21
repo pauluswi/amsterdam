@@ -100,7 +100,12 @@ public class SettlementService {
                 event.getPaymentId(),
                 status,
                 reason,
-                mockPacs002
+                mockPacs002,
+                event.getAmount(),       // amount as String
+                event.getCurrency(),
+                event.getDebtorIban(),
+                event.getCreditorIban(),
+                event.getServiceLevel()
         );
         kafkaTemplate.send(paymentStatusTopic, event.getPaymentId(), statusEvent);
         log.info("PaymentStatusEvent for payment ID: {} (Status: {}) published to Kafka topic {}.", event.getPaymentId(), status, paymentStatusTopic);
