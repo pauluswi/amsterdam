@@ -185,10 +185,12 @@ samples/
 sepa-instant-gateway/
 |
 ├── docs/
-├── services/
-├── samples/
-├── postman/
+├── common/ # shared events, models and utilities
+├── payment-service/ # REST API: payment initiation, idempotency, pacs.008
+├── settlement-service/ # Settlement simulator, pacs.002 generation
+├── ledger-service/ # Ledger and account balances
 ├── docker-compose.yml
+├── pom.xml
 └── README.md
 ```
 
